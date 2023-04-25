@@ -119,9 +119,5 @@ game:GetService("Players").PlayerAdded:Connect(function(v)
       CreateEsp(v)
       v.CharacterAdded:Connect(CreateEsp(v))
    end
-
-   if enabled then
-    CreateEsp(v):Destroy()
-   end
 end)
 return Config
