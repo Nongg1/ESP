@@ -1,3 +1,4 @@
+--by Novaz5792
 repeat task.wait() until game:IsLoaded() 
 
 if (not _G.LoadedX) then 
