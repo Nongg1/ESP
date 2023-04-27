@@ -1,25 +1,92 @@
---by Novaz5792
+getgenv().Workspace = game:GetService("Workspace")
+getgenv().RunService = game:GetService("RunService")
+getgenv().Players = game:GetService("Players")
+getgenv().RenderStepped = RunService.RenderStepped 
+getgenv().Stepped = RunService.Stepped 
+getgenv().Player = Players.LocalPlayer 
+getgenv().Character = Player.Character or Player.CharacterAdded:Wait() 
+getgenv().HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+getgenv().Humanoid = Character:WaitForChild("Humanoid") 
+getgenv().Camera = Workspace.CurrentCamera
 
-if (not _G.LoadedX) then 
-    _G.LoadedX = true 
-    getgenv().Workspace = game:GetService("Workspace")
-    getgenv().RunService = game:GetService("RunService")
-    getgenv().Players = game:GetService("Players")
-    getgenv().RenderStepped = RunService.RenderStepped 
-    getgenv().Stepped = RunService.Stepped 
-    getgenv().Player = Players.LocalPlayer 
-    getgenv().Character = Player.Character or Player.CharacterAdded:Wait() 
-    getgenv().HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-    getgenv().Humanoid = Character:WaitForChild("Humanoid") 
-    getgenv().Camera = Workspace.CurrentCamera
+local drawings = {}
+RenderStepped:Connect(function()
+    for i,v in pairs(drawings) do 
+        if v[1] and v[1].Character and v[1].Character:FindFirstChild("HumanoidRootPart") and v[1].Character:FindFirstChildOfClass("Humanoid") then 
+            local x, c = Camera:WorldToViewportPoint(v[1].Character.HumanoidRootPart.Position)
+            if x and c then 
+                pcall(function()
+                    v[2].Text =((_G.settingsTable.espname and v[1].Name.."\n") or "")
+                    ..((_G.settingsTable.esphealth and math.floor(v[1].Character.Humanoid.Health).."/"..math.floor(v[1].Character.Humanoid.MaxHealth).."\n") or "")
+                    ..((_G.settingsTable.espdistance and math.floor((HumanoidRootPart.Position - v[1].Character.HumanoidRootPart.Position).Magnitude).."m\n") or "")
+                    ..((_G.settingsTable.espfruit and "Fruit: "..(v[1]:FindFirstChild("MAIN_DATA") and v[1].MAIN_DATA:FindFirstChild("Slot") and v[1].MAIN_DATA:FindFirstChild("Slots") and tostring(v[1].MAIN_DATA.Slots:FindFirstChild(v[1].MAIN_DATA.Slot.Value) and v[1].MAIN_DATA.Slots:FindFirstChild(v[1].MAIN_DATA.Slot.Value).Value)).."\n") or "")
+                    ..((_G.settingsTable.esplevel and "Level: "..math.floor(((v[1].Character.Humanoid.MaxHealth - 100) / 4)).."\n") or "")
+                    v[2].Visible = (_G.settingsTable.esp) 
+                    v[2].Position = Vector2.new(x.X, x.Y)
+                    v[2].Size = (_G.settingsTable.espsize) 
+                    v[2].Color = Color3.fromRGB(0, 255, 0)
+                end)
+            else
+                pcall(function()
+                    v[2].Visible = false 
+                end)
+            end 
+        elseif v[1] then 
+            pcall(function()
+                v[2].Visible = false 
+            end)
+        elseif (not v[1]) then 
+            pcall(function()
+                v[2]:Remove()
+            end)
+        end 
+    end 
+end)
 
-    Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
-        getgenv().Camera = Workspace.CurrentCamera 
-    end)
-
-    Player.CharacterAdded:Connect(function(character)
-        getgenv().Character = character 
-        getgenv().HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-        getgenv().Humanoid = Character:WaitForChild("Humanoid")
-    end)
+for i,v in pairs(Players:GetPlayers()) do 
+    if v == Player then 
+        continue 
+    end 
+    task.spawn(function() 
+        local x = Drawing.new("Text") 
+        x.Position = Vector2.new() 
+        x.Text = ""
+        x.Visible = false 
+        x.Size = 15 
+        x.Color = Color3.fromRGB(255, 0, 0)
+        x.Center = true 
+        x.Outline = true 
+        x.OutlineColor = Color3.fromRGB(1, 1, 1)
+        table.insert(drawings, {v, x})
+    end) 
 end 
+
+Players.PlayerAdded:Connect(function(plr)
+    task.spawn(function() 
+        local x = Drawing.new("Text") 
+        x.Position = Vector2.new() 
+        x.Text = ""
+        x.Visible = false 
+        x.Size = 15 
+        x.Color = Color3.fromRGB(255, 0, 0)
+        x.Center = true 
+        x.Outline = true 
+        x.OutlineColor = Color3.fromRGB(1, 1, 1)
+        table.insert(drawings, {plr, x})
+    end) 
+end)
+
+Players.PlayerRemoving:Connect(function(Plr)
+    for i,v in pairs(drawings) do 
+        if v[1] and v[1] == Plr then 
+            task.spawn(function()
+                pcall(function()
+                    for i = 1, 10 do 
+                        v[2]:Remove()
+                        task.wait(.1)
+                    end 
+                end)
+            end)
+        end 
+    end 
+end)
