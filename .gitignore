@@ -1,3 +1,6 @@
+--by Novaz5792
+--by Novaz5792
+
 getgenv().Workspace = game:GetService("Workspace")
 getgenv().RunService = game:GetService("RunService")
 getgenv().Players = game:GetService("Players")
